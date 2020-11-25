@@ -1,0 +1,25 @@
+{
+  "name": "caldar",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Briansangermano/CaldAR.git"
+  },
+  "keywords": [
+    "26122612colo"
+  ],
+  "author": "Brian Sangermano",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Briansangermano/CaldAR/issues"
+  },
+  "homepage": "https://github.com/Briansangermano/CaldAR#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
