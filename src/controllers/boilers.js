@@ -1,30 +1,105 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
+const db = require("../models");
+const Boiler = db.boiler;
 
-const boilers = require(".././routes/boilers")
+//Create a new Boiler
+exports.create = (req, res) => {
+  if (!req.body.id_boiler || !req.body.description || !req.body.type || !req.body.maintance_rate || !req.body.hour_maintaince_cost || !req.body.hour_eventual_cost) {
+    res.status(400).send({ message: "Content can not be empty!" });
+    return;
+  }
 
-const app = express();
+  const boiler = new Boiler({
+    id_boiler: req.body.id_boiler,
+    description: req.body.description,
+    type: req.body.type,
+    maintance_rate: req.body.maintance_rate,
+    hour_maintaince_cost: req.body.hour_maintaince_cost,
+    hour_eventual_cost: req.body.hour_eventual_cost,
+  });
 
-//bodyparser Midelware
+  boiler
+    .save(boiler)
+    .then(data => {
+      res.send(data);
+    })
+    .catch(err => {
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while creating the Boiler."
+      });
+    });
+};
+//Retrieve all Boilers from the DB
+exports.findAll = (req, res) => {
+  Boiler.find({})
+    .then(data => {
+      res.send(data);
+    })
+    .catch(err => {
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while retrieving Boiler."
+      });
+    });
+};
+//Find a Boiler by ID
+exports.findOne = (req, res) => {
+  Boiler.findOne({id_boiler: req.params.id})
+    .then(data => {
+      if (!data) {
+        return res.status(404).send({
+          message: `Boiler with id ${req.params.id} was not found`
+        })
+      }
+      res.send(data)
+    })
+    .catch(err => {
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while retrieving Boiler."
+      });
+    });
+};
+//Update a Boiler by ID
+exports.update = (req, res) => {
+  if (!req.body) {
+    return res.status(400).send({
+      message: "Data to update can not be empty!"
+    });
+  }
 
-app.use(bodyParser.json());
+  if (!req.body.id_boiler || !req.body.description || !req.body.type || !req.body.maintance_rate || !req.body.hour_maintaince_cost || !req.body.hour_eventual_cost) {
+    res.status(400).send({ message: "Content can not be empty!" });
+    return;
+  }
 
-//DB Config
-const db = require("../config/keys").mongoURI;
+  const id = req.params.id;
 
-//Connect with mongo DB
-mongoose
-    .connect(db)
-    .then(()=> console.log("Mongo DB Conected"))
-    .catch(err=> console.log(err));
-
-//use Routes
-app.use("./models/boilers", items);
-
-//PORT
-
-const PORT = process.env.PORT || 3000;
-
-
-app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+  Boiler.findOneAndUpdate({id_boiler: id}, req.body, { useFindAndModify: false })
+    .then(data => {
+      if (!data) {
+        res.status(404).send({
+          message: `Cannot update Boiler Type with id=${id}.  Boiler Type was not found!`
+        });
+      } else res.send({ message: "Boiler Type was updated successfully." });
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Error updating Boiler Type with id=" + id
+      });
+    });
+  
+};
+//Delete Boilers By ID
+exports.delete = (req, res) => {
+  const id = req.params.id;
+  Boiler.findOneAndRemove({id_boiler: id}, { useFindAndModify: false })
+    .then(data =>
+      res.send({ message: "Boiler Type was removed successfully." })
+    )
+    .catch(err => {
+      res.status(500).send({
+        message: "Error removing Boiler Type with id=" + id
+      });
+    });
+};
